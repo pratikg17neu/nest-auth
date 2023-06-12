@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { User } from './model/user.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { RegisterDto } from './dtos/registerUser.dto';
@@ -19,6 +24,27 @@ export class AuthService {
     user.email = createUserDto.email;
     user.password = hash; //
     return user.save();
-    // return await this.userRepository.save(user);
+  }
+
+  async login(email: string, password: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found!', HttpStatus.BAD_REQUEST);
+    } else {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (isPasswordValid) {
+        return user;
+      } else {
+        throw new HttpException(
+          'Credentials are not valid!',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+    }
   }
 }
