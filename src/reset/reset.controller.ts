@@ -9,7 +9,7 @@ export class ResetController {
   async forgot(@Body('email') email: string) {
     await this.resetService.create(email);
     return {
-      message: 'Success',
+      message: 'Success! Check your email',
     };
   }
 }
