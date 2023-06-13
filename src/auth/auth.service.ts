@@ -52,10 +52,8 @@ export class AuthService {
     const jwt = this.jwtService.sign({ id: user.id });
 
     res.cookie('jwt', jwt, { httpOnly: true });
-
-    return {
-      ...user,
-    };
+    delete user.password;
+    return user.toJSON();
   }
 
   async getUser(cookie: any): Promise<User> {

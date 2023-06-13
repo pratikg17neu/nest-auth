@@ -14,6 +14,7 @@ import { Response, Request } from 'express';
 import { User } from './model/user.entity';
 import { AuthInterceptor } from './auth.interceptor';
 
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller()
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -31,7 +32,16 @@ export class AuthController {
     return this.authService.login(email, password, response);
   }
 
-  @UseInterceptors(ClassSerializerInterceptor, AuthInterceptor)
+  @UseInterceptors(AuthInterceptor)
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie('jwt');
+    return {
+      message: 'Success',
+    };
+  }
+
+  @UseInterceptors(AuthInterceptor)
   @Get('user')
   user(@Req() req: Request): Promise<User> {
     const cookie = req.cookies['jwt'];

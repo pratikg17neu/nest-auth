@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ConfigModule } from '@nestjs/config';
+import { ResetModule } from './reset/reset.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ConfigModule } from '@nestjs/config';
       autoLoadModels: true,
       synchronize: true,
     }),
+    ResetModule,
   ],
   controllers: [AppController],
   providers: [AppService],
