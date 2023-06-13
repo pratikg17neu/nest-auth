@@ -18,6 +18,7 @@ import { AuthInterceptor } from './auth.interceptor';
 @Controller()
 export class AuthController {
   constructor(private authService: AuthService) {}
+
   @Post('register')
   async register(@Body() createUser: RegisterDto) {
     return this.authService.create(createUser);
