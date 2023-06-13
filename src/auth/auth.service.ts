@@ -8,12 +8,16 @@ import { User } from './model/user.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { RegisterDto } from './dtos/registerUser.dto';
 import * as bcrypt from 'bcrypt';
+import { Response, response } from 'express';
+import { JwtService } from '@nestjs/jwt';
+import { where } from 'sequelize';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User)
     private readonly userRepository: typeof User,
+    private jwtService: JwtService,
   ) {}
 
   async create(createUserDto: RegisterDto): Promise<User> {
@@ -26,7 +30,7 @@ export class AuthService {
     return user.save();
   }
 
-  async login(email: string, password: string): Promise<User> {
+  async login(email: string, password: string, res: Response) {
     const user = await this.userRepository.findOne({
       where: {
         email,
@@ -35,16 +39,32 @@ export class AuthService {
 
     if (!user) {
       throw new HttpException('User not found!', HttpStatus.BAD_REQUEST);
-    } else {
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (isPasswordValid) {
-        return user;
-      } else {
-        throw new HttpException(
-          'Credentials are not valid!',
-          HttpStatus.FORBIDDEN,
-        );
-      }
     }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new HttpException(
+        'Credentials are not valid!',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const jwt = this.jwtService.sign({ id: user.id });
+
+    res.cookie('jwt', jwt, { httpOnly: true });
+
+    return {
+      ...user,
+    };
+  }
+
+  async getUser(cookie: any): Promise<User> {
+    const data: any = await this.jwtService.decode(cookie);
+    const user = await this.userRepository.findOne({
+      where: {
+        id: data.id,
+      },
+    });
+    return user.toJSON();
   }
 }

@@ -1,3 +1,4 @@
+import { Exclude } from '@nestjs/class-transformer';
 import {
   AutoIncrement,
   Column,
@@ -5,6 +6,7 @@ import {
   Model,
   PrimaryKey,
   Table,
+  
 } from 'sequelize-typescript';
 
 @Table({ tableName: 'users' })
@@ -39,6 +41,7 @@ export class User extends Model {
   })
   email: string;
 
+  @Exclude()
   @Column({
     type: DataType.STRING,
     allowNull: false,
