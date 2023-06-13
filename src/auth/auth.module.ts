@@ -20,6 +20,7 @@ import { ConfigService } from '@nestjs/config';
     }),
   ],
   providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {
   constructor(private configService: ConfigService) {}

@@ -65,4 +65,18 @@ export class AuthService {
     });
     return user.toJSON();
   }
+
+  async findOneByEmail(email: string) {
+    const user = await this.userRepository.findOne({
+      where: {
+        email: email,
+      },
+    });
+
+    return user;
+  }
+
+  async update(user: User) {
+    return user.save();
+  }
 }
