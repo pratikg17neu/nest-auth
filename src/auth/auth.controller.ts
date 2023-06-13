@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dtos/registerUser.dto';
 import { Response, Request } from 'express';
 import { User } from './model/user.entity';
+import { AuthInterceptor } from './auth.interceptor';
 
 @Controller()
 export class AuthController {
@@ -30,7 +31,7 @@ export class AuthController {
     return this.authService.login(email, password, response);
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
+  @UseInterceptors(ClassSerializerInterceptor, AuthInterceptor)
   @Get('user')
   user(@Req() req: Request): Promise<User> {
     const cookie = req.cookies['jwt'];
